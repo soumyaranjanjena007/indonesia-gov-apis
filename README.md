@@ -1,41 +1,124 @@
 # 🇮🇩 Indonesia Government APIs & Data Sources
 
-A comprehensive reference for Indonesian government open data portals, APIs, and data sources — with practical Python examples, scraping patterns, and gotchas learned from production use.
+A comprehensive reference for **50 Indonesian government data portals, APIs, and data sources** — with practical Python examples, scraping patterns, and gotchas learned from production use.
 
 > **Why this exists:** Indonesian government APIs are poorly documented, frequently change without notice, and have quirks not covered in official docs. This repo captures real-world knowledge from building production applications against these data sources.
 
-## Data Sources
+## 🤖 Use as an AI Agent Skill
 
-### Finance & Economy
-| Source | Agency | Docs | API? |
-|--------|--------|------|------|
-| [OJK Legality Check](apis/ojk/) | Otoritas Jasa Keuangan | Licensed & illegal financial entities | ❌ Scraping |
-| [Bank Indonesia](apis/bank-indonesia/) | Bank Indonesia | Exchange rates, interest rates, money supply | ✅ REST API |
-| [IDX Stock Data](apis/idx/) | Indonesia Stock Exchange | Stock prices, corporate actions | ⚠️ Unofficial |
-| [BPS Statistics](apis/bps/) | Badan Pusat Statistik | National statistics (GDP, CPI, trade, etc.) | ✅ REST API |
-| [BAPPEBTI](apis/bappebti/) | Badan Pengawas Perdagangan Berjangka Komoditi | Commodities futures brokers | ❌ HTML scraping |
+This repo includes a [`SKILL.md`](SKILL.md) that makes it usable as a Claude/OpenClaw agent skill:
 
-### Food Safety & Halal
-| Source | Agency | Docs | API? |
-|--------|--------|------|------|
-| [BPJPH Halal](apis/bpjph/) | Badan Penyelenggara Jaminan Produk Halal | Halal certification database (~1.98M businesses) | ✅ JSON API |
-| [BPOM](apis/bpom/) | Badan Pengawas Obat dan Makanan | Registered food, drugs, cosmetics | ⚠️ DataTables |
+```bash
+# Clone and use as a local skill reference
+git clone https://github.com/suryast/indonesia-gov-apis.git
+```
 
-### Government Services
-| Source | Agency | Docs | API? |
-|--------|--------|------|------|
-| [data.go.id](apis/data-go-id/) | National Open Data Portal | 10,000+ datasets (CKAN-based) | ✅ CKAN API |
-| [LAPOR](apis/lapor/) | National Public Complaint System | Complaint tracking | ❌ No API |
+## 🔌 MCP Servers
 
-### Tax & Business
-| Source | Agency | Docs | API? |
-|--------|--------|------|------|
-| [NTA Invoice Registry](apis/nta/) | National Tax Agency (JP equivalent for reference) | Invoice number validation | ✅ REST API (requires app ID) |
+Connect Indonesian data sources to AI assistants via [Model Context Protocol](https://modelcontextprotocol.io):
+
+```bash
+# Connect pasal.id (Indonesian law) to Claude
+claude mcp add --transport http pasal-id https://pasal-mcp-server-production.up.railway.app/mcp
+```
+
+See [`mcp-servers/`](mcp-servers/) for full setup instructions and a list of data sources ready for MCP wrapping.
+
+---
+
+## Data Sources by Tier
+
+### Tier 1: Open APIs — Ready to Consume (12 sources)
+
+| # | Source | Agency | Docs | API? |
+|---|--------|--------|------|------|
+| 1 | [Portal Satu Data (SDI)](apis/tier1-open-apis/data-go-id/) | Bappenas | CKAN portal, 10K+ datasets | ✅ CKAN API |
+| 2 | [BPS Statistics](apis/tier1-open-apis/bps/) | Badan Pusat Statistik | GDP, CPI, population, trade | ✅ REST API |
+| 3 | [BMKG Weather](apis/tier1-open-apis/bmkg/) | BMKG | Weather, earthquakes, tsunami | ✅ JSON feeds |
+| 4 | [IDX / BEI](apis/tier1-open-apis/idx/) | Bursa Efek Indonesia | Stock prices, corporate data | ⚠️ Unofficial |
+| 5 | [pasal.id MCP](apis/tier1-open-apis/pasal-id/) | Open Source | 40K regulations, 937K articles | 🔵 MCP Ready |
+| 6 | [JDIH BPK](apis/tier1-open-apis/jdih-bpk/) | BPK / Perpusnas | Legal documentation network | ✅ Partial API |
+| 7 | [Putusan MA](apis/tier1-open-apis/putusan-ma/) | Mahkamah Agung | Court decisions (millions) | ✅ Public search |
+| 8 | [LPSE / INAPROC](apis/tier1-open-apis/lpse-inaproc/) | LKPP | Government procurement tenders | ⚠️ Scrape (689 hosts) |
+| 9 | [Portal APBN](apis/tier1-open-apis/apbn-kemenkeu/) | Kemenkeu | State budget data | ✅ CSV/XLSX |
+| 10 | [Bank Indonesia](apis/tier1-open-apis/bank-indonesia/) | Bank Indonesia | Exchange rates, BI Rate | ✅ REST API |
+| 11 | [BIG Geospatial](apis/tier1-open-apis/big-geospatial/) | BIG | Admin boundaries, zoning | ✅ WMS/WFS |
+| 12 | [BNPB Disaster](apis/tier1-open-apis/bnpb-disaster/) | BNPB | Disaster events, risk data | ✅ REST + GeoJSON |
+
+### Tier 2: Scrapeable Web — Structured Data, No Formal API (10 sources)
+
+| # | Source | Agency | Docs | Format |
+|---|--------|--------|------|--------|
+| 13 | [BPJPH Halal](apis/tier2-scrapeable/bpjph/) | BPJPH Kemenag | 1.98M halal businesses | JSON POST |
+| 14 | [BPOM Products](apis/tier2-scrapeable/bpom/) | BPOM | 242K food/drug registrations | DataTables+CSRF |
+| 15 | [AHU Company Registry](apis/tier2-scrapeable/ahu-company/) | Kemenkumham | All registered PT, CV, Firma | HTML+CAPTCHA |
+| 16 | [OSS / NIB](apis/tier2-scrapeable/oss-nib/) | BKPM | Business ID (NIB) lookup | HTML forms |
+| 17 | [OJK Registry](apis/tier2-scrapeable/ojk/) | OJK | Licensed financial entities | HTML+XLS |
+| 18 | [KPK e-LHKPN](apis/tier2-scrapeable/kpk-lhkpn/) | KPK | Officials' wealth declarations | HTML+PDF |
+| 19 | [Putusan MK](apis/tier2-scrapeable/putusan-mk/) | Mahkamah Konstitusi | Constitutional court decisions | HTML+PDF |
+| 20 | [KSEI Statistics](apis/tier2-scrapeable/ksei/) | KSEI | Securities investor stats | PDF/XLSX |
+| 21 | [e-PPID](apis/tier2-scrapeable/ppid/) | All Ministries | Public information requests | Per ministry |
+| 22 | [Pajak / DJP](apis/tier2-scrapeable/pajak-djp/) | DJP | NPWP verification | Login required |
+
+### Tier 3: Regional Open Data Portals (6 sources)
+
+| # | Source | Region | Docs | Quality |
+|---|--------|--------|------|---------|
+| 23 | [Satu Data Jakarta](apis/tier3-regional/satu-data-jakarta/) | DKI Jakarta | Best-in-class regional | ⭐ CKAN API |
+| 24 | [Open Data Jabar](apis/tier3-regional/opendata-jabar/) | Jawa Barat | Good API quality | ⭐ CKAN API |
+| 25 | [Open Data Jatim](apis/tier3-regional/opendata-jatim/) | Jawa Timur | 38 kabupaten/kota | ✅ CKAN API |
+| 26 | [Satu Data Surabaya](apis/tier3-regional/satu-data-surabaya/) | Surabaya | Complete city-level | ✅ CKAN API |
+| 27 | [Open Data Bandung](apis/tier3-regional/opendata-bandung/) | Bandung | Smart city data | ✅ CKAN API |
+| 28 | [Open Data Bali](apis/tier3-regional/opendata-bali/) | Bali | Tourism, agriculture | ⚠️ CSV/XLSX |
+
+### Tier 4: Ministry-Specific Data (8 sources)
+
+| # | Source | Ministry | Docs | Key Data |
+|---|--------|----------|------|----------|
+| 29 | [Kemnaker](apis/tier4-ministry/kemnaker/) | Ketenagakerjaan | UMR/UMP wages, employment stats | ⚠️ Partial API |
+| 30 | [Komdigi](apis/tier4-ministry/komdigi/) | Komunikasi Digital | Internet penetration, digital literacy | ⚠️ XLSX |
+| 31 | [ESDM Energy](apis/tier4-ministry/esdm-energy/) | ESDM | Energy production, mining permits | ⚠️ PDF/XLSX |
+| 32 | [KKP Fisheries](apis/tier4-ministry/kkp-fisheries/) | Kelautan & Perikanan | Fish catch, aquaculture, vessels | ⚠️ XLSX |
+| 33 | [ATR/BPN Land](apis/tier4-ministry/atr-bpn/) | ATR / BPN | Land certificates, PTSL | ❌ Login |
+| 34 | [Kemendikdasmen](apis/tier4-ministry/kemendikdasmen/) | Pendidikan | School registry (NPSN), teachers | ⚠️ Partial API |
+| 35 | [Kemenkes Health](apis/tier4-ministry/kemenkes/) | Kesehatan | Hospital/clinic registry, SATUSEHAT | ⚠️ Partial API |
+| 36 | [Kemenag](apis/tier4-ministry/kemenag/) | Agama | 300K+ mosques, pesantren registry | ⚠️ Scrape |
+
+### Tier 5: Anti-Corruption & Transparency (5 sources)
+
+| # | Source | Organization | Docs | Key Data |
+|---|--------|-------------|------|----------|
+| 37 | [OCCRP Aleph](apis/tier5-transparency/occrp-aleph/) | OCCRP | Beneficial ownership, leaks data | ✅ REST API |
+| 38 | [OpenCorporates](apis/tier5-transparency/opencorporates/) | OpenCorporates | Global company registry (ID subset) | ✅ REST API |
+| 39 | [EITI Indonesia](apis/tier5-transparency/eiti-indonesia/) | EITI / ESDM | Mining & oil/gas revenue transparency | ⚠️ Reports |
+| 40 | [AHU-BO](apis/tier5-transparency/ahu-bo/) | Kemenkumham | Beneficial ownership registry | ⚠️ Web search |
+| 41 | [ICW Corruption Watch](apis/tier5-transparency/icw-corruption/) | ICW (NGO) | Corruption case tracker | ⚠️ Web database |
+
+### Tier 6: Financial Sector (4 sources)
+
+| # | Source | Agency | Docs | Key Data |
+|---|--------|--------|------|----------|
+| 42 | [OJK SIKEPO](apis/tier6-financial/ojk-sikepo/) | OJK | Fintech/crypto licensed platforms | ⚠️ PDF+HTML |
+| 43 | [Satgas Waspada Investasi](apis/tier6-financial/satgas-waspada/) | OJK Task Force | Illegal investment alerts | ✅ Public list |
+| 44 | [KSEI Investor Stats](apis/tier6-financial/ksei-stats/) | KSEI | Monthly investor statistics | ⚠️ XLSX/PDF |
+| 45 | [DJPB Budget](apis/tier6-financial/djpb-budget/) | DJPB Kemenkeu | APBN spending execution | ⚠️ XLS/CSV |
+
+### Tier 7: Civil Society & Geospatial (5 sources)
+
+| # | Source | Organization | Docs | Key Data |
+|---|--------|-------------|------|----------|
+| 46 | [LAPOR!](apis/tier7-civil-society/lapor/) | KemenPANRB | Public complaint system | ⚠️ Web portal |
+| 47 | [IndoLII](apis/tier7-civil-society/indolii/) | USAID | Bilingual legal information | ⚠️ Web search |
+| 48 | [OGP Indonesia](apis/tier7-civil-society/ogp-indonesia/) | OGP | Ministry transparency scores | ⚠️ Reports |
+| 49 | [Geoportal One Map](apis/tier7-civil-society/geoportal-onemap/) | BIG / KLHK | 85 thematic maps, One Map Policy | ✅ WMS/WFS |
+| 50 | [SIGAP / InaRisk](apis/tier7-civil-society/sigap-inarisk/) | BNPB | Disaster risk scores by location | ✅ REST API |
+
+---
 
 ## Quick Start
 
 ```python
-# Example: Search BPJPH halal database
+# Search BPJPH halal database
 import requests
 
 resp = requests.post(
@@ -47,57 +130,50 @@ businesses = resp.json()["data"]
 print(f"Found {len(businesses)} businesses")
 ```
 
-## Common Patterns & Gotchas
+```python
+# Get BMKG earthquake data (no auth needed)
+resp = requests.get("https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json")
+quake = resp.json()["Infogempa"]["gempa"]
+print(f"Latest: M{quake['Magnitude']} at {quake['Wilayah']}")
+```
+
+## Common Gotchas
 
 ### 🚫 IP Blocking
-Most Indonesian government sites block datacenter IPs (AWS, GCP, DO). Solutions:
-1. **Cloudflare Workers proxy** — route requests through CF edge (recommended)
-2. **Residential proxy** — reliable but costs money
-3. **Rate limiting** — 2-5s delays between requests
+Most Indonesian gov sites block datacenter IPs (AWS, GCP, DO). Use Cloudflare Workers proxy or residential proxy.
 
 ### 📄 Data Formats
-Indonesian government sites predominantly use:
-- **Excel (.xlsx)** — most common download format
-- **PDF** — especially for financial/legal data
-- **HTML tables** — DataTables jQuery plugin is ubiquitous
-- **JSON APIs** — rare but exist (BPJPH, BPS, BI)
+Government sites love Excel and PDF. Use `openpyxl` for Excel, `pdfplumber` for PDF.
 
-### 🔄 Pagination
-Common pagination patterns:
-- DataTables: `start` + `length` params, `recordsTotal` in response
-- CKAN: `offset` + `limit` params
-- Custom: varies wildly
+### 🔐 CSRF Tokens
+BPOM and some OJK pages require session cookies + CSRF tokens. Always use `requests.Session()`.
 
-### 🔐 Authentication
-- Most public data: no auth needed
-- CSRF tokens: BPOM requires session cookies + CSRF
-- API keys: BPS requires free registration
-- OAuth: rare (BI API for some endpoints)
+### 🔄 CKAN API
+data.go.id, Jakarta, Jabar, Jatim, Surabaya, Bandung all use CKAN. Same API pattern works everywhere:
+```python
+requests.get("https://{portal}/api/3/action/package_search", params={"q": "keyword", "rows": 10})
+```
 
 ## Project Structure
 
 ```
-apis/
-├── bank-indonesia/     # Exchange rates, BI Rate, statistics
-├── bappebti/           # Commodities futures brokers
-├── bpjph/              # Halal certification database
-├── bpom/               # Food, drug, cosmetics registry
-├── bps/                # National statistics (BPS)
-├── data-go-id/         # National open data portal (CKAN)
-├── idx/                # Stock exchange data
-├── lapor/              # Public complaint system
-├── nta/                # Tax invoice validation
-└── ojk/                # Financial entity legality
-examples/
-├── search_halal.py     # Search halal-certified businesses
-├── check_ojk.py        # Check if a financial entity is legal
-├── bi_exchange.py      # Get Bank Indonesia exchange rates
-└── bps_inflation.py    # Get inflation data from BPS
+├── README.md
+├── SKILL.md                      # AI agent skill file
+├── mcp-servers/                  # MCP server setup guides
+├── apis/
+│   ├── tier1-open-apis/          # 12 sources with REST/JSON APIs
+│   ├── tier2-scrapeable/         # 10 sources requiring scraping
+│   ├── tier3-regional/           # 6 regional open data portals
+│   ├── tier4-ministry/           # 8 ministry-specific sources
+│   ├── tier5-transparency/       # 5 anti-corruption sources
+│   ├── tier6-financial/          # 4 financial sector sources
+│   └── tier7-civil-society/      # 5 civil society & geospatial
+└── examples/                     # Working Python examples
 ```
 
 ## Contributing
 
-Know an Indonesian government API that's not listed? Found a gotcha? PRs welcome!
+Know an Indonesian government API not listed here? Found a gotcha? PRs welcome!
 
 ## Disclaimer
 
