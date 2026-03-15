@@ -172,6 +172,15 @@ requests.get("https://{portal}/api/3/action/package_search", params={"q": "keywo
 └── examples/                     # Working Python examples
 ```
 
+## Related Projects
+
+| Project | Description |
+|---------|-------------|
+| [**indonesia-civic-stack**](https://github.com/suryast/indonesia-civic-stack) | Production-ready Python SDK + MCP server wrapping 11 government portals |
+| [**indonesia-civic-signal-monitor**](https://github.com/suryast/indonesia-civic-signal-monitor) | Anomaly detection engine — monitors civic data for newsworthy changes |
+
+This repo is the **reference documentation** layer. The civic-stack SDK is the **code** layer. The signal monitor is the **intelligence** layer.
+
 ## Contributing
 
 Know an Indonesian government API not listed here? Found a gotcha? PRs welcome!
