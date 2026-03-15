@@ -83,3 +83,4 @@ resp = requests.get("https://sirup.lkpp.go.id/sirup/ro/rekappaketpenyedia/satker
 4. **Vendor history lookup** — useful for due diligence on contractor past wins
 5. **Some portals block datacenter IPs** — residential proxies may be needed
 6. **SiRUP = plans only** — actual contracts are in LPSE
+7. **DNS unreliable** — many LPSE portals (including lpse.lkpp.go.id) had DNS resolution failures from both Indonesian and non-Indonesian IPs as of March 2026

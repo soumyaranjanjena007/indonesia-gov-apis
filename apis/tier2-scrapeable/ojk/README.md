@@ -86,13 +86,28 @@ OJK Website → Scraper → Local DB → Your API → App
 BAPPEBTI Website ↗
 ```
 
+## Endpoint Status (Updated March 2026)
+
+| Endpoint | Status | Notes |
+|----------|--------|-------|
+| `api.ojk.go.id` | ❌ **DNS dead** (NXDOMAIN) | Was the REST API — no longer resolves |
+| `investor.ojk.go.id` | ❌ **DNS dead** (NXDOMAIN) | Was InvestorAlert API — no longer resolves |
+| `sikapiuangmu.ojk.go.id` | ✅ Alive | AlertPortal/Negative for waspada list |
+| `www.ojk.go.id` | ✅ Alive | **Indonesia-only** (geo-restricted, 403 from non-ID IPs) |
+| `reksadana.ojk.go.id` | ⚠️ Unknown | May have been retired |
+
+### Geo-Restriction
+
+`www.ojk.go.id` is strictly geo-restricted to Indonesian IPs. Singapore gets 403, Australia gets 403. Only Jakarta (Indonesian IP) returns 200. Use an Indonesian VPS/proxy.
+
 ## Gotchas
 
-1. **No stable API** — OJK frequently redesigns their website
+1. **No stable API** — OJK frequently redesigns their website; `api.ojk.go.id` was retired without notice
 2. **Mixed formats** — some data is Excel, some PDF, some HTML
 3. **ASP.NET ViewState** — some pages require session + ViewState token
 4. **Rate limiting** — be gentle, 2-5s between requests
-5. **IP blocking** — datacenter IPs may be blocked
+5. **Geo-blocking** — `www.ojk.go.id` blocks non-Indonesian IPs (403)
 6. **Stale data** — illegal entity list updated irregularly
 7. **P2P lending list** is a PDF that changes URL each update
 8. **BAPPEBTI is separate from OJK** but covers crypto/futures regulation
+9. **AlertPortal is JS-rendered** — `/FrontEnd/AlertPortal/Negative` needs browser/Playwright
