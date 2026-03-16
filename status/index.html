@@ -122,18 +122,18 @@
   .pill.warn { background: var(--warn-dim); color: var(--warn); }
   .pill.down { background: var(--down-dim); color: var(--down); }
 
-  /* Spark chart */
-  .spark { display: flex; align-items: end; gap: 1px; height: 24px; }
+  /* Status pills */
+  .spark { display: flex; align-items: center; gap: 1.5px; height: 24px; }
   .spark-bar {
-    width: 3.5px; min-height: 2px; border-radius: 1px;
+    flex: 1; max-width: 6px; min-width: 2px; height: 18px; border-radius: 1.5px;
     transition: opacity .15s; cursor: default; position: relative;
   }
-  .spark-bar.up { background: var(--up); height: 100%; }
-  .spark-bar.geo_blocked_intl, .spark-bar.geo_blocked_id { background: var(--warn); height: 75%; }
-  .spark-bar.blocked { background: var(--warn); height: 50%; }
-  .spark-bar.error, .spark-bar.down { background: var(--down); height: 30%; }
-  .spark-bar.dns_dead { background: var(--down); height: 8%; opacity: .4; }
-  .spark-bar.empty { background: var(--border); height: 3px; opacity: .5; }
+  .spark-bar.up { background: var(--up); }
+  .spark-bar.geo_blocked_intl, .spark-bar.geo_blocked_id { background: var(--warn); }
+  .spark-bar.blocked { background: var(--warn); opacity: .6; }
+  .spark-bar.error, .spark-bar.down { background: var(--down); }
+  .spark-bar.dns_dead { background: var(--down); opacity: .5; }
+  .spark-bar.empty { background: var(--border); opacity: .15; }
   .spark-bar:hover { opacity: .6; }
 
   .tooltip {
@@ -171,8 +171,12 @@
 
   .loading { text-align: center; padding: 4rem; color: var(--text-dim); font-family: var(--font-mono); }
 
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     .summary { grid-template-columns: repeat(2, 1fr); }
+    .portal-row { grid-template-columns: 1fr 80px auto; }
+    .spark { max-width: 80px; }
+  }
+  @media (max-width: 480px) {
     .portal-row { grid-template-columns: 1fr auto; }
     .spark { display: none; }
   }
@@ -209,18 +213,16 @@ const TIER_NAMES = {
   7: "Civil Society & Geospatial",
 };
 
-const DAYS = 90;
+const MAX_DAYS = 90;
+const MIN_DAYS = 7;
 
 async function load() {
   try {
-    const indexRes = await fetch("data/index.json");
-    const allDays = await indexRes.json();
+    const historyRes = await fetch("data/history.json");
+    const dayData = await historyRes.json();
+    const allDays = Object.keys(dayData).sort();
+    const DAYS = Math.max(MIN_DAYS, Math.min(MAX_DAYS, allDays.length));
     const days = allDays.slice(-DAYS);
-
-    const dayData = {};
-    await Promise.all(days.map(async (d) => {
-      try { const r = await fetch(`data/${d}.json`); dayData[d] = await r.json(); } catch {}
-    }));
 
     const latest = dayData[days[days.length - 1]];
     if (!latest) { document.getElementById("portals").innerHTML = "<p>No data yet.</p>"; return; }
@@ -249,7 +251,7 @@ async function load() {
     for (const [pid, info] of Object.entries(latest.portals)) {
       const t = info.tier || 1;
       if (!tiers[t]) tiers[t] = [];
-      tiers[t].push({ id: pid, ...info });
+      tiers[t].push({ ...info, pid });
     }
 
     let html = "";
@@ -260,8 +262,8 @@ async function load() {
         const padded = [];
         for (let i = 0; i < DAYS; i++) {
           const dayKey = days[days.length - DAYS + i];
-          if (dayKey && dayData[dayKey] && dayData[dayKey].portals[portal.id]) {
-            const s = dayData[dayKey].portals[portal.id].status;
+          if (dayKey && dayData[dayKey] && dayData[dayKey].portals[portal.pid]) {
+            const s = dayData[dayKey].portals[portal.pid].status;
             padded.push({ status: s, date: dayKey });
           } else {
             padded.push({ status: "empty", date: "" });
