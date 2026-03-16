@@ -1,86 +1,108 @@
 # LPSE / INAPROC — Government Procurement Data
 
 **Agency:** LKPP (National Procurement Policy Agency)
-**Central Portal:** https://inaproc.id
-**LPSE Network:** https://lpse.*.go.id (689 individual portals)
-**SiRUP (Plans):** https://sirup.lkpp.go.id
-**API type:** ⚠️ Limited central API + structured HTML scraping
+**Central Portal:** https://spse.inaproc.id (directory — Next.js, migrated 2026)
+**Legacy LPSE Network:** https://lpse.*.go.id → most CNAME to ars.inaproc.id now
+**API type:** ⚠️ Structured HTML scraping + SPSE JSON endpoints
 
-## Overview
+## Migration Status (March 2026)
 
-All Indonesian government procurement runs through LPSE (Layanan Pengadaan Secara Elektronik) portals. 689 regional portals all run identical SPSE software — one scraper works on all of them. INAPROC aggregates centrally.
+LKPP is migrating from individual `lpse.*.go.id` domains to `inaproc.id`:
 
-## INAPROC Central Search
+| Domain | Status | Notes |
+|--------|--------|-------|
+| lpse.lkpp.go.id | ❌ DNS dead | Old central portal |
+| lpse.pu.go.id | ❌ DNS dead | Ministry of Public Works |
+| lpse.kominfo.go.id | ❌ DNS dead | Ministry of Communications |
+| lpse.kemenkeu.go.id | ⚠️ CNAME → ars.inaproc.id | CF challenge (403) |
+| lpse.kemkes.go.id | ⚠️ CNAME → ars.inaproc.id | CF challenge (403) |
+| lpse.jakarta.go.id | ✅ Still active | DKI Jakarta |
+| lpse.kemenag.go.id | ✅ Still active | Ministry of Religion |
+| inaproc.id | ⚠️ CF Turnstile | Root domain challenges all requests |
+| spse.inaproc.id | ✅ Portal (Next.js) | Directory only, no tender API |
+| ars.inaproc.id | 🔒 Pomerium auth | Internal admin portal |
+
+## SPSE JSON API (per-portal)
+
+Individual portals still expose standard SPSE endpoints when accessible:
 
 ```python
-import requests
+import httpx
 
-resp = requests.get("https://inaproc.id/api/tender", params={
-    "keyword": "konstruksi gedung",
-    "status": "aktif",
-    "page": 1,
-    "limit": 20,
-})
-tenders = resp.json()
+PORTALS = [
+    "https://lpse.jakarta.go.id/eproc4",
+    "https://lpse.kemenag.go.id/eproc4",
+]
+
+async def search_vendors(portal_base: str, keyword: str):
+    """Standard SPSE vendor search — works on any /eproc4 portal."""
+    async with httpx.AsyncClient(timeout=15) as client:
+        resp = await client.get(
+            f"{portal_base}/dt/rekanan",
+            params={"term": keyword, "draw": "1", "start": "0", "length": "10"},
+        )
+        return resp.json()
+
+async def search_tenders(portal_base: str, keyword: str):
+    """Standard SPSE tender search."""
+    async with httpx.AsyncClient(timeout=15) as client:
+        resp = await client.get(
+            f"{portal_base}/dt/tender",
+            params={"term": keyword, "draw": "1", "start": "0", "length": "10"},
+        )
+        return resp.json()
 ```
 
-## LPSE Portal Scraping (works on all 689 portals)
+## SPSE Response Format
 
-All portals run identical SPSE software — same HTML structure everywhere:
-
-```python
-from bs4 import BeautifulSoup
-import requests
-
-def search_lpse(base_url, keyword, page=0):
-    resp = requests.get(f"{base_url}/lelang/list", params={
-        "namaPaket": keyword,
-        "statusLelang": "selesai",
-        "page": page,
-        "rpp": 50,
-    }, timeout=30)
-    soup = BeautifulSoup(resp.text, "html.parser")
-    rows = soup.select("table.list-tender tbody tr")
-    results = []
-    for row in rows:
-        cells = row.find_all("td")
-        if len(cells) >= 4:
-            results.append({
-                "name": cells[1].text.strip(),
-                "agency": cells[2].text.strip(),
-                "value": cells[3].text.strip(),
-            })
-    return results
-
-# Works on any LPSE portal
-data = search_lpse("https://lpse.jakarta.go.id", "jalan")
+### Vendor (`/dt/rekanan`)
+```json
+{
+  "data": [
+    {
+      "kodeRekanan": "R-001",
+      "namaRekanan": "PT CONTOH SEJAHTERA",
+      "npwp": "01.234.567.8-012.000",
+      "alamat": "Jl. Sudirman No. 1",
+      "kota": "Jakarta",
+      "statusAktif": true
+    }
+  ]
+}
 ```
 
-## Major LPSE Portals
-
-| Portal | URL |
-|--------|-----|
-| Central (LKPP) | https://lpse.lkpp.go.id |
-| Jakarta | https://lpse.jakarta.go.id |
-| Jawa Barat | https://lpse.jabarprov.go.id |
-| Kemenkes | https://lpse.kemkes.go.id |
-| Kemen PUPR | https://lpse.pu.go.id |
-
-## SiRUP — Annual Procurement Plans
-
-```python
-resp = requests.get("https://sirup.lkpp.go.id/sirup/ro/rekappaketpenyedia/satker", params={
-    "tahun": 2025,
-    "idSatker": "123456",
-})
+### Tender (`/dt/tender`)
+```json
+{
+  "data": [
+    {
+      "kode": "T-001",
+      "namaPaket": "Pengadaan Komputer",
+      "namaSatker": "Dinas Pendidikan DKI Jakarta",
+      "nilaiPagu": 1000000000,
+      "tahapTender": "Pengumuman"
+    }
+  ]
+}
 ```
 
 ## Gotchas
 
 1. **SPSE software is identical across portals** — write scraper once, run everywhere
-2. **INAPROC central API is limited** — not all fields available centrally
-3. **Pagination** — `page` is 0-indexed, use `rpp` for page size
-4. **Vendor history lookup** — useful for due diligence on contractor past wins
-5. **Some portals block datacenter IPs** — residential proxies may be needed
-6. **SiRUP = plans only** — actual contracts are in LPSE
-7. **DNS unreliable** — many LPSE portals (including lpse.lkpp.go.id) had DNS resolution failures from both Indonesian and non-Indonesian IPs as of March 2026
+2. **Many portals migrating to inaproc.id** — individual domains becoming CNAMEs
+3. **Cloudflare Turnstile** on inaproc.id — `cf-mitigated: challenge` header, requires browser/Playwright
+4. **Jakarta proxy required** — geo-blocked portals need Indonesian IP
+5. **spse.inaproc.id is a directory only** — lists LPSE instances, does NOT provide tender search API
+6. **ars.inaproc.id requires Pomerium SSO** — not publicly accessible
+7. **Pagination** — `start` is 0-indexed, `length` for page size
+8. **DNS is unreliable** — check resolution before scraping, portals go down without notice
+
+## civic-stack SDK
+
+```python
+from civic_stack.lpse import fetch, search, search_tenders
+
+# Searches across all reachable portals
+result = await fetch("PT Garuda Indonesia", proxy_url="socks5h://127.0.0.1:1080")
+tenders = await search_tenders("konstruksi", proxy_url="socks5h://127.0.0.1:1080")
+```
