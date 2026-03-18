@@ -43,7 +43,7 @@ See [`mcp-servers/`](mcp-servers/) for full setup instructions and a list of dat
 | 5 | [DJPB Treasury](apis/tier1-open-apis/djpb-treasury/) | Kemenkeu | Treasury, disbursement data | ✅ CKAN API |
 | 6 | [JDIH BPK](apis/tier1-open-apis/jdih-bpk/) | BPK / Perpusnas | Legal documentation network | ✅ Partial API |
 | 7 | [Putusan MA](apis/tier1-open-apis/putusan-ma/) | Mahkamah Agung | Court decisions (millions) | ✅ Public search |
-| 8 | [LPSE / INAPROC](apis/tier1-open-apis/lpse-inaproc/) | LKPP | Government procurement tenders | ⚠️ Migrating to inaproc.id (CF challenge) |
+| 8 | [LPSE / INAPROC](apis/tier1-open-apis/lpse-inaproc/) | LKPP | Government procurement tenders | ❌ DEGRADED — all portals dead, migrated to inaproc.id (WAF/SSO) |
 | 9 | [Portal APBN](apis/tier1-open-apis/apbn-kemenkeu/) | Kemenkeu | State budget data | ✅ CSV/XLSX |
 | 10 | [Bank Indonesia](apis/tier1-open-apis/bank-indonesia/) | Bank Indonesia | Exchange rates, BI Rate | ✅ REST API |
 | 11 | [BIG Geospatial](apis/tier1-open-apis/big-geospatial/) | BIG | Admin boundaries, zoning | ✅ WMS/WFS |
